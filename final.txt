@@ -1,0 +1,167 @@
+
+;---------------------------------;
+;           DATA OF PORT          ;
+;---------------------------------;
+DATA SEGMENT
+PORTA EQU 00H
+PORTB EQU 02H
+PORTC EQU 04H
+PORT_CON EQU 06H
+DATA ENDS
+
+CODE SEGMENT 
+     MOV AX, DATA
+     MOV DX, AX
+     
+ORG 0000H
+
+START:
+      MOV DX, PORT_CON
+      MOV AL, 10000000B
+      OUT DX, AL
+      JMP PROGRAM
+      
+PROGRAM: 
+
+STATE_1:
+      MOV DX, PORTC
+      MOV AL, S1
+      OUT DX, AL
+      ;CALL DELAY
+;STATE_2      
+      CALL COUNT_26s
+         
+STATE_3:
+      MOV DX, PORTC
+      MOV AL, S3
+      OUT DX, AL
+       ;CALL DELAY
+;STATE_4
+       CALL COUNT_3s
+
+STATE_5:
+      MOV DX, PORTC
+      MOV AL, S5
+      OUT DX, AL
+      ;CALL DELAY
+;STATE_2      
+      CALL COUNT_26s
+
+STATE_7:
+      MOV DX, PORTC
+      MOV AL, S7
+      OUT DX, AL
+      ;CALL DELAY
+;STATE_4      
+      CALL COUNT_3s
+      JMP STATE_1
+      
+DELAY:
+      MOV BX, 0BA03H
+ D1: DEC BX
+      NOP
+      JNZ D1
+      RET
+      
+COUNT_26s:
+    MOV SI, 0
+    MOV DI, 0 
+    MOV DX, PORTA          
+    MOV AL, 10100100B   
+    OUT DX, AL
+    CALL COUNT
+    
+    MOV SI, 0
+    MOV DI, 0 
+    MOV DX, PORTA          
+    MOV AL, 11111001B   
+    OUT DX, AL
+    CALL COUNT
+    
+    MOV SI, 0
+    MOV DI, 0 
+    MOV DX, PORTA          
+    MOV AL, 11000000B   
+    OUT DX, AL
+    CALL COUNT_3
+    RET
+COUNT_3s: 
+    MOV SI, 0
+    MOV DI, 0 
+    MOV DX, PORTA          
+    MOV AL, 11000000B   
+    OUT DX, AL
+    CALL COUNT_0
+    RET
+ ;-----------------------------------------------------;  
+COUNT:
+;L0: MOV CX, 1FFFH
+L1: MOV AL, S4[SI]
+    MOV DX, PORTB
+    OUT DX, AL
+    ;LOOP L1
+    CALL DELAY
+    INC SI
+    CMP SI, 10
+    JL L1
+ RET
+ 
+COUNT_3:
+;L0: MOV CX, 1FFFH
+LL1: MOV AL, S6[SI]
+    MOV DX, PORTB
+    OUT DX, AL
+    ;LOOP L1
+    CALL DELAY
+    INC SI
+    CMP SI, 6
+    JL LL1
+ RET
+ 
+ COUNT_0:
+;L0: MOV CX, 1FFFH
+LLL1: MOV AL, S8[SI]
+    MOV DX, PORTB
+    OUT DX, AL
+    ;LOOP LLL1
+    CALL DELAY
+    INC SI
+    CMP SI, 4
+    JL LLL1
+ RET
+;---------------------------------;
+;      STATE OF TRAFFIC LIGHT     ;
+;---------------------------------;
+
+;PORTC                   76543210
+S1               db      00001100b
+S3               db      00001010b
+S5               db      00100001b
+S7               db      00010001b
+
+S4 DB 10010000B
+   DB 10000000B
+   DB 11011000B
+   DB 10000010B
+   DB 10010010B
+   DB 10011001B
+   DB 10110000B  
+   DB 10100100B  
+   DB 11111001B   
+   DB 11000000B
+
+S6 DB 10010000B
+   DB 10000000B
+   DB 11011000B
+   DB 10000010B
+   DB 10010010B
+   DB 10011001B
+   
+S8 DB 10110000B  
+   DB 10100100B  
+   DB 11111001B   
+   DB 11000000B
+ 
+CODE ENDS
+END
+
